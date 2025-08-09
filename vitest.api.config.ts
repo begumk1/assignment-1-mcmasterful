@@ -6,8 +6,8 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
-        include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-        exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'build', 'client', 'tests'],
+        include: ['tests/**/*.spec.ts'],
+        exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'build', 'client'],
         setupFiles: ['./src/__tests__/setup.ts'],
     },
 });

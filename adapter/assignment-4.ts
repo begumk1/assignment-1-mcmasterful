@@ -1,4 +1,5 @@
 import previous_assignment from './assignment-3';
+import { DefaultApi, Configuration } from '../client';
 
 export type BookID = string;
 export type ShelfId = string;
@@ -21,34 +22,13 @@ export interface Filter {
     author?: string;
 }
 
+// Initialize the API client
+const apiClient = new DefaultApi(new Configuration({ basePath: 'http://localhost:3000' }));
+
 async function listBooks(filters?: Filter[]): Promise<Book[]> {
     try {
-        let url = 'http://localhost:3000/books';
-        if (filters && filters.length > 0) {
-            const params = new URLSearchParams();
-            filters.forEach((filter, index) => {
-                if (filter.from !== undefined) {
-                    params.append(`filters[${index}][from]`, filter.from.toString());
-                }
-                if (filter.to !== undefined) {
-                    params.append(`filters[${index}][to]`, filter.to.toString());
-                }
-                if (filter.name !== undefined) {
-                    params.append(`filters[${index}][name]`, filter.name);
-                }
-                if (filter.author !== undefined) {
-                    params.append(`filters[${index}][author]`, filter.author);
-                }
-            });
-            url += '?' + params.toString();
-        }
+        const books = await apiClient.getBooks();
         
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const books = await response.json() as any[];
         return books.map(book => ({
             id: book._id,
             name: book.name,
@@ -74,16 +54,8 @@ async function removeBook(book: BookID): Promise<void> {
 
 async function lookupBookById(book: BookID): Promise<Book> {
     try {
-        const response = await fetch(`http://localhost:3000/books/${book}`);
+        const bookData = await apiClient.getBookById(book);
         
-        if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error('Book not found');
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const bookData = await response.json() as any;
         return {
             id: bookData._id,
             name: bookData.name,
@@ -105,16 +77,11 @@ async function placeBooksOnShelf(
     shelf: ShelfId
 ): Promise<void> {
     try {
-        const response = await fetch('http://localhost:3000/warehouse/place-books', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bookId, numberOfBooks, shelf }),
+        await apiClient.placeBooksOnShelf({
+            bookId,
+            numberOfBooks,
+            shelf
         });
-
-        if (!response.ok) {
-            const errorData = await response.json() as { error?: string };
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
     } catch (error) {
         console.error('Error placing books on shelf:', error);
         throw error;
@@ -123,18 +90,10 @@ async function placeBooksOnShelf(
 
 async function orderBooks(order: BookID[]): Promise<{ orderId: OrderId }> {
     try {
-        const response = await fetch('http://localhost:3000/warehouse/order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ books: order }),
+        const result = await apiClient.orderBooks({
+            books: order
         });
-
-        if (!response.ok) {
-            const errorData = await response.json() as { error?: string };
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json() as { orderId: string };
+        
         return { orderId: result.orderId };
     } catch (error) {
         console.error('Error creating order:', error);
@@ -146,15 +105,12 @@ async function findBookOnShelf(
     book: BookID
 ): Promise<Array<{ shelf: ShelfId; count: number }>> {
     try {
-        const response = await fetch(`http://localhost:3000/warehouse/find-book/${book}`);
-
-        if (!response.ok) {
-            const errorData = await response.json() as { error?: string };
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const locations = await response.json() as Array<{ shelf: string; count: number }>;
-        return locations;
+        const locations = await apiClient.findBookOnShelf(book);
+        
+        return locations.map(location => ({
+            shelf: location.shelf,
+            count: location.count
+        }));
     } catch (error) {
         console.error('Error finding book on shelf:', error);
         throw error;
@@ -170,16 +126,10 @@ async function fulfilOrder(
     }>
 ): Promise<void> {
     try {
-        const response = await fetch('http://localhost:3000/warehouse/fulfil-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId: order, booksFulfilled }),
+        await apiClient.fulfilOrder({
+            orderId: order,
+            booksFulfilled
         });
-
-        if (!response.ok) {
-            const errorData = await response.json() as { error?: string };
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
     } catch (error) {
         console.error('Error fulfilling order:', error);
         throw error;
@@ -190,15 +140,12 @@ async function listOrders(): Promise<
     Array<{ orderId: OrderId; books: Record<BookID, number> }>
 > {
     try {
-        const response = await fetch('http://localhost:3000/warehouse/orders');
-
-        if (!response.ok) {
-            const errorData = await response.json() as { error?: string };
-            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-        }
-
-        const orders = await response.json() as Array<{ orderId: string; books: Record<string, number> }>;
-        return orders;
+        const orders = await apiClient.listOrders();
+        
+        return orders.map(order => ({
+            orderId: order.orderId,
+            books: order.books
+        }));
     } catch (error) {
         console.error('Error listing orders:', error);
         throw error;

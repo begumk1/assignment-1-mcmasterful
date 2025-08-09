@@ -10,17 +10,20 @@ export interface BookDatabaseAccessor {
     books: Collection<Book>;
 }
 
-export function getBookDatabase(): BookDatabaseAccessor {
-    // If we aren't testing, we are creating random database names
+export function getBookDatabase(dbName?: string): BookDatabaseAccessor {
     const bookListingDatabase = client.db(
-        (global as any).MONGO_URI !== undefined
-            ? `book-listing-${Math.floor(Math.random() * 100000)}`
-            : 'mcmasterful-book-listing'
+        dbName 
+            ? `book-listing-${dbName}`
+            : (global as any).MONGO_URI !== undefined
+                ? `book-listing-${Math.floor(Math.random() * 100000)}`
+                : 'mcmasterful-book-listing'
     );
     const warehouseDatabase = client.db(
-        (global as any).MONGO_URI !== undefined
-            ? `warehouse-${Math.floor(Math.random() * 100000)}`
-            : 'mcmasterful-warehouse'
+        dbName
+            ? `warehouse-${dbName}`
+            : (global as any).MONGO_URI !== undefined
+                ? `warehouse-${Math.floor(Math.random() * 100000)}`
+                : 'mcmasterful-warehouse'
     );
     const books = bookListingDatabase.collection<Book>('books');
     
@@ -31,15 +34,15 @@ export function getBookDatabase(): BookDatabaseAccessor {
     };
 }
 
-export async function seedTestDatabase(books: Book[]): Promise<void> {
-    const { books: booksCollection } = getBookDatabase();
+export async function seedTestDatabase(books: Book[], dbName?: string): Promise<void> {
+    const { books: booksCollection } = getBookDatabase(dbName);
     if (books.length > 0) {
         await booksCollection.insertMany(books);
     }
 }
 
-export async function clearTestDatabase(): Promise<void> {
-    const { books, bookListingDatabase, warehouseDatabase } = getBookDatabase();
+export async function clearTestDatabase(dbName?: string): Promise<void> {
+    const { books, bookListingDatabase, warehouseDatabase } = getBookDatabase(dbName);
     await books.deleteMany({});
     
     // Clear warehouse collections

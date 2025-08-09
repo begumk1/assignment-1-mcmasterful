@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - front-end
+      - server1
+      - server2
+      - server3
+      - mongo
+
+  front-end:
+    image: ghcr.io/mcmastercce/bvd-103-mcmasterful-books/mcmasterful-books-docker:main
+    volumes:
+      - ./adapter:/source/adapter
+    ports:
+      - "9080:9080"
+
+  server1:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: npx -y tsx ./src/server-tsoa.ts
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+
+  server2:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: npx -y tsx ./src/server-tsoa.ts
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+
+  server3:
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: npx -y tsx ./src/server-tsoa.ts
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: mcmasterful-books

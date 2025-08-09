@@ -40,14 +40,14 @@ export interface Filter {
 export class BooksRoutes {
     /**
      * Get all books with their current stock levels
-     * @param filters - Optional filters for price range, name, or author
      * @param request - Koa request object for database access
+     * @param filters - Optional filters for price range, name, or author
      * @returns Array of books with stock information
      */
     @Get('/')
     public async getBooks(
-        @Query() filters?: Filter[],
-        @Request() request: KoaRequest
+        @Request() request: KoaRequest,
+        @Query() filters?: Filter[]
     ): Promise<BookWithStock[]> {
         const ctx: ParameterizedContext<AppWarehouseDatabaseState & AppBookDatabaseState> = request.ctx;
         

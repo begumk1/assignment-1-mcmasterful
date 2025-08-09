@@ -1,7 +1,8 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import { RegisterRoutes } from '../build/routes';
-import koaSwagger from 'koa2-swagger-ui';
+// Fix the koa2-swagger-ui import
+const koaSwagger = require('koa2-swagger-ui') as any;
 import swaggerJson from '../build/swagger.json';
 import { AppState } from './server-launcher';
 

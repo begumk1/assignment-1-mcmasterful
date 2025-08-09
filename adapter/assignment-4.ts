@@ -22,14 +22,14 @@ export interface Filter {
     author?: string;
 }
 
-// Initialize the API client
-const apiClient = new DefaultApi(new Configuration({ basePath: 'http://localhost:3000' }));
+// Initialize the API client with relative path for reverse proxy
+const apiClient = new DefaultApi(new Configuration({ basePath: '/api' }));
 
 async function listBooks(filters?: Filter[]): Promise<Book[]> {
     try {
         const books = await apiClient.getBooks();
         
-        return books.map(book => ({
+        return books.map((book: any) => ({
             id: book._id,
             name: book.name,
             author: book.author,
@@ -107,7 +107,7 @@ async function findBookOnShelf(
     try {
         const locations = await apiClient.findBookOnShelf(book);
         
-        return locations.map(location => ({
+        return locations.map((location: any) => ({
             shelf: location.shelf,
             count: location.count
         }));
@@ -142,7 +142,7 @@ async function listOrders(): Promise<
     try {
         const orders = await apiClient.listOrders();
         
-        return orders.map(order => ({
+        return orders.map((order: any) => ({
             orderId: order.orderId,
             books: order.books
         }));

@@ -5,6 +5,7 @@
     "spec": {
         "outputDirectory": "build",
         "specVersion": 3,
+        "basePath": "/api",
         "securityDefinitions": {
             "api_key": {
                 "type": "apiKey",

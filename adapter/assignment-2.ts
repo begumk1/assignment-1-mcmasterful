@@ -16,11 +16,59 @@ async function listBooks(filters?: Array<{from?: number, to?: number}>) : Promis
 }
 
 async function createOrUpdateBook(book: Book): Promise<BookID> {
-    throw new Error("Todo")
+    try {
+        const url = 'http://localhost:3000/books';
+        const method = book.id ? 'PUT' : 'POST';
+        const finalUrl = book.id ? `${url}/${book.id}` : url;
+        
+        const bookData = {
+            name: book.name,
+            author: book.author,
+            description: book.description,
+            price: book.price,
+            image: book.image
+        };
+
+        const response = await fetch(finalUrl, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bookData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return book.id || result.id;
+    } catch (error) {
+        console.error('Error creating/updating book:', error);
+        throw error;
+    }
 }
 
 async function removeBook(book: BookID): Promise<void> {
-    throw new Error("Todo")
+    try {
+        const url = `http://localhost:3000/books/${book}`;
+        
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error removing book:', error);
+        throw error;
+    }
 }
 
 const assignment = "assignment-2";

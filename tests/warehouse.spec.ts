@@ -38,7 +38,6 @@ describe('Warehouse API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // First place some books
             await client.placeBooksOnShelf({
                 bookId: 'test-book-1',
                 numberOfBooks: 3,
@@ -92,7 +91,6 @@ describe('Warehouse API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // Create an order first
             await client.orderBooks({
                 books: ['test-book-1', 'test-book-2']
             });
@@ -111,19 +109,16 @@ describe('Warehouse API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // Place books first
             await client.placeBooksOnShelf({
                 bookId: 'test-book-1',
                 numberOfBooks: 5,
                 shelf: 'shelf-a'
             });
 
-            // Create order
             const orderResult = await client.orderBooks({
                 books: ['test-book-1', 'test-book-1']
             });
 
-            // Fulfil order
             const result = await client.fulfilOrder({
                 orderId: orderResult.orderId,
                 booksFulfilled: [{
@@ -140,19 +135,16 @@ describe('Warehouse API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // Place insufficient books
             await client.placeBooksOnShelf({
                 bookId: 'test-book-1',
                 numberOfBooks: 1,
                 shelf: 'shelf-a'
             });
 
-            // Create order
             const orderResult = await client.orderBooks({
                 books: ['test-book-1', 'test-book-1']
             });
 
-            // Try to fulfil with insufficient stock
             await expect(
                 client.fulfilOrder({
                     orderId: orderResult.orderId,

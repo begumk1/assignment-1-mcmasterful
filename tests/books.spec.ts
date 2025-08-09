@@ -43,7 +43,6 @@ describe('Books API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // First get all books to find an existing book ID
             const books = await client.getBooks();
             if (books.length > 0) {
                 const bookId = books[0]._id;
@@ -94,7 +93,6 @@ describe('Books API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // First get all books to find an existing book ID
             const books = await client.getBooks();
             if (books.length > 0) {
                 const bookId = books[0]._id;
@@ -113,7 +111,6 @@ describe('Books API', () => {
             const context = getTestContext();
             const client = new DefaultApi(new Configuration({ basePath: context.address }));
 
-            // First get all books to find an existing book ID
             const books = await client.getBooks();
             if (books.length > 0) {
                 const bookId = books[0]._id;

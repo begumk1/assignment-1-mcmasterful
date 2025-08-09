@@ -1,15 +1,18 @@
 import createRouter from 'koa-zod-router';
 import { z } from 'zod';
 import { Context } from 'koa';
-import { dbService } from './database';
+import { dbService, Filter } from './database';
 
 const router = createRouter();
 
 const FilterSchema = z.object({
     from: z.number().optional(),
     to: z.number().optional(),
+    name: z.string().optional(),
+    author: z.string().optional(),
 }).refine((data) => {
-    if (data.from === undefined && data.to === undefined) {
+    if (data.from === undefined && data.to === undefined && 
+        data.name === undefined && data.author === undefined) {
         return false;
     }
     if (data.from !== undefined && data.to !== undefined && data.from > data.to) {
@@ -17,7 +20,7 @@ const FilterSchema = z.object({
     }
     return true;
 }, {
-    message: "Invalid filter: at least one of 'from' or 'to' must be defined, and 'from' must be <= 'to' when both are provided"
+    message: "Invalid filter: at least one condition must be defined, and 'from' must be <= 'to' when both are provided"
 });
 
 const FiltersSchema = z.array(FilterSchema).optional();
@@ -37,7 +40,7 @@ router.get('/books', async (ctx: Context) => {
         
         let books;
         if (validatedFilters && validatedFilters.length > 0) {
-            books = await dbService.getBooksByPriceRange(validatedFilters);
+            books = await dbService.getBooksByFilters(validatedFilters as Filter[]);
         } else {
             books = await dbService.getAllBooks();
         }
@@ -91,7 +94,14 @@ router.put('/books/:id', async (ctx: Context) => {
         const bookData = ctx.request.body;
         const validatedBook = BookSchema.partial().parse(bookData);
         
-        await dbService.updateBook(bookId, validatedBook);
+        const updateData: Partial<{ name: string; author: string; description: string; price: number; image: string }> = {};
+        if (validatedBook.name !== undefined) updateData.name = validatedBook.name;
+        if (validatedBook.author !== undefined) updateData.author = validatedBook.author;
+        if (validatedBook.description !== undefined) updateData.description = validatedBook.description;
+        if (validatedBook.price !== undefined) updateData.price = validatedBook.price;
+        if (validatedBook.image !== undefined) updateData.image = validatedBook.image;
+        
+        await dbService.updateBook(bookId, updateData);
         ctx.body = { message: 'Book updated successfully' };
     } catch (error) {
         if (error instanceof z.ZodError) {

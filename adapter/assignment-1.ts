@@ -4,7 +4,7 @@ export interface Book {
     description: string,
     price: number,
     image: string,
-};
+}
 
 async function listBooks(filters?: Array<{from?: number, to?: number}>) : Promise<Book[]>{
     try {

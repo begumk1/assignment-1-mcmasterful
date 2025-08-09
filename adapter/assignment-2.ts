@@ -9,7 +9,7 @@ export interface Book {
     description: string,
     price: number,
     image: string,
-};
+}
 
 async function listBooks(filters?: Array<{from?: number, to?: number}>) : Promise<Book[]>{
     return assignment1.listBooks(filters);
@@ -38,11 +38,11 @@ async function createOrUpdateBook(book: Book): Promise<BookID> {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json() as { error?: string };
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
+        const result = await response.json() as { id: string };
         return book.id || result.id;
     } catch (error) {
         console.error('Error creating/updating book:', error);
@@ -62,7 +62,7 @@ async function removeBook(book: BookID): Promise<void> {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json() as { error?: string };
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
     } catch (error) {

@@ -9,6 +9,13 @@ export interface Book {
     image: string;
 }
 
+export interface Filter {
+    from?: number;
+    to?: number;
+    name?: string;
+    author?: string;
+}
+
 class DatabaseService {
     private client: MongoClient;
     private db: Db | null = null;
@@ -104,15 +111,33 @@ class DatabaseService {
         return await this.booksCollection.find({}).toArray();
     }
 
-    async getBooksByPriceRange(filters: Array<{from?: number, to?: number}>): Promise<Book[]> {
+    async getBooksByFilters(filters: Filter[]): Promise<Book[]> {
         if (!this.booksCollection) throw new Error('Database not connected');
         
+        if (!filters || filters.length === 0) {
+            return await this.getAllBooks();
+        }
+
         const query = {
             $or: filters.map(filter => {
-                const priceQuery: any = {};
-                if (filter.from !== undefined) priceQuery.$gte = filter.from;
-                if (filter.to !== undefined) priceQuery.$lte = filter.to;
-                return { price: priceQuery };
+                const conditions: Record<string, unknown> = {};
+                
+                if (filter.from !== undefined || filter.to !== undefined) {
+                    const priceQuery: Record<string, number> = {};
+                    if (filter.from !== undefined) priceQuery.$gte = filter.from;
+                    if (filter.to !== undefined) priceQuery.$lte = filter.to;
+                    conditions.price = priceQuery;
+                }
+                
+                if (filter.name !== undefined) {
+                    conditions.name = { $regex: filter.name, $options: 'i' };
+                }
+                
+                if (filter.author !== undefined) {
+                    conditions.author = { $regex: filter.author, $options: 'i' };
+                }
+                
+                return conditions;
             })
         };
 

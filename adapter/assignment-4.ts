@@ -10,14 +10,14 @@ export interface Book {
   price: number
   image: string
   stock?: number
-};
+}
 
 export interface Filter {
   from?: number
   to?: number
   name?: string
   author?: string
-};
+}
 
 // If multiple filters are provided, any book that matches at least one of them should be returned
 // Within a single filter, a book would need to match all the given conditions

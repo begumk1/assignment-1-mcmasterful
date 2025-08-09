@@ -4,7 +4,13 @@
     "description": "This is a template repository for the first assignment in BVD 103 at McMaster Continuing Education.",
     "main": "index.js",
     "scripts": {
-        "start-server": "ts-node src/server.ts"
+        "start-server": "ts-node src/server.ts",
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint . --ext .ts --fix",
+        "format": "prettier --write .",
+        "type-check": "tsc --noEmit",
+        "build": "tsc",
+        "test": "npm run lint && npm run type-check"
     },
     "keywords": [],
     "author": "",
@@ -26,6 +32,10 @@
         "@types/koa-qs": "^2.0.3",
         "@types/koa-router": "^7.4.8",
         "@types/node": "^22.5.5",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "eslint": "^8.0.0",
+        "prettier": "^3.0.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.6.2"
     }

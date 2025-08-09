@@ -2,6 +2,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import qs from 'koa-qs';
 import routes from './routes';
+import warehouseRoutes from './warehouse-routes';
 import { dbService } from './database';
 
 const app = new Koa();
@@ -10,6 +11,8 @@ qs(app);
 app.use(bodyParser());
 app.use(routes.allowedMethods());
 app.use(routes.routes());
+app.use(warehouseRoutes.allowedMethods());
+app.use(warehouseRoutes.routes());
 
 const PORT = 3000;
 

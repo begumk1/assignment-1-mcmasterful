@@ -18,7 +18,8 @@ export interface Filter {
 
 class DatabaseService {
     private client: MongoClient;
-    private db: Db | null = null;
+    private bookListingDb: Db | null = null;
+    private warehouseDb: Db | null = null;
     private booksCollection: Collection<Book> | null = null;
 
     constructor() {
@@ -29,8 +30,12 @@ class DatabaseService {
     async connect() {
         try {
             await this.client.connect();
-            this.db = this.client.db('mcmasterful-books');
-            this.booksCollection = this.db.collection<Book>('books');
+            
+            // Separate databases for different bounded contexts
+            this.bookListingDb = this.client.db('mcmasterful-book-listing');
+            this.warehouseDb = this.client.db('mcmasterful-warehouse');
+            
+            this.booksCollection = this.bookListingDb.collection<Book>('books');
 
             await this.initializeBooks();
             console.log('Connected to MongoDB');
@@ -42,6 +47,18 @@ class DatabaseService {
 
     async disconnect() {
         await this.client.close();
+    }
+
+    getBookListingDb(): Db | null {
+        return this.bookListingDb;
+    }
+
+    getWarehouseDb(): Db | null {
+        return this.warehouseDb;
+    }
+
+    getDb(): Db | null {
+        return this.bookListingDb;
     }
 
     private async initializeBooks() {
@@ -183,6 +200,13 @@ class DatabaseService {
         if (result.deletedCount === 0) {
             throw new Error('Book not found');
         }
+    }
+
+    async getBookById(id: string): Promise<Book | null> {
+        if (!this.booksCollection) throw new Error('Database not connected');
+
+        const book = await this.booksCollection.findOne({ _id: id });
+        return book;
     }
 }
 

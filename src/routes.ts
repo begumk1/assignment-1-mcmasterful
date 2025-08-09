@@ -2,8 +2,15 @@ import createRouter from 'koa-zod-router';
 import { z } from 'zod';
 import { Context } from 'koa';
 import { dbService, Filter } from './database';
+import { MongoDBBookRepository, MongoDBStockService } from './mongodb-repositories';
+import { MongoDBWarehouseRepository } from './mongodb-repositories';
 
 const router = createRouter();
+
+// Create repositories for book listing
+const bookRepository = new MongoDBBookRepository(dbService.getBookListingDb()!);
+const warehouseRepository = new MongoDBWarehouseRepository(dbService.getWarehouseDb()!);
+const stockService = new MongoDBStockService(warehouseRepository);
 
 const FilterSchema = z
     .object({
@@ -65,7 +72,18 @@ router.get(
                 books = await dbService.getAllBooks();
             }
 
-            ctx.body = books;
+            // Add stock information to each book
+            const booksWithStock = await Promise.all(
+                books.map(async (book) => {
+                    const stock = await stockService.getStockLevel(book._id!);
+                    return {
+                        ...book,
+                        stock
+                    };
+                })
+            );
+
+            ctx.body = booksWithStock;
         } catch (error) {
             if (error instanceof z.ZodError) {
                 ctx.status = 400;
@@ -184,6 +202,39 @@ router.delete(
                 ctx.status = 500;
                 ctx.body = { error: `Failed to delete book due to: ${error}` };
             }
+        }
+    },
+    {
+        params: z.object({
+            id: z.string(),
+        }),
+    }
+);
+
+router.get(
+    '/books/:id',
+    async (ctx: Context) => {
+        try {
+            const bookId = ctx.params.id;
+            const book = await dbService.getBookById(bookId);
+
+            if (!book) {
+                ctx.status = 404;
+                ctx.body = { error: 'Book not found' };
+                return;
+            }
+
+            // Add stock information
+            const stock = await stockService.getStockLevel(bookId);
+            const bookWithStock = {
+                ...book,
+                stock
+            };
+
+            ctx.body = bookWithStock;
+        } catch (error) {
+            ctx.status = 500;
+            ctx.body = { error: `Failed to fetch book due to: ${error}` };
         }
     },
     {

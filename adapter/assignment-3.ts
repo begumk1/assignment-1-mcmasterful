@@ -21,15 +21,21 @@ export interface Filter {
 async function listBooks(filters?: Filter[]): Promise<Book[]> {
     try {
         let url = 'http://localhost:3000/books';
-        
+
         if (filters && filters.length > 0) {
             const params = new URLSearchParams();
             filters.forEach((filter, index) => {
                 if (filter.from !== undefined) {
-                    params.append(`filters[${index}][from]`, filter.from.toString());
+                    params.append(
+                        `filters[${index}][from]`,
+                        filter.from.toString()
+                    );
                 }
                 if (filter.to !== undefined) {
-                    params.append(`filters[${index}][to]`, filter.to.toString());
+                    params.append(
+                        `filters[${index}][to]`,
+                        filter.to.toString()
+                    );
                 }
                 if (filter.name !== undefined) {
                     params.append(`filters[${index}][name]`, filter.name);
@@ -40,14 +46,14 @@ async function listBooks(filters?: Filter[]): Promise<Book[]> {
             });
             url += '?' + params.toString();
         }
-        
+
         const response = await fetch(url);
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
-        const books = await response.json() as Book[];
+
+        const books = (await response.json()) as Book[];
         return books;
     } catch (error) {
         console.error('Error fetching books from API:', error);
@@ -69,5 +75,5 @@ export default {
     assignment,
     createOrUpdateBook,
     removeBook,
-    listBooks
+    listBooks,
 };

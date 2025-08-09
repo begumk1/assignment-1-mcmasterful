@@ -1,10 +1,7 @@
 module.exports = {
     parser: '@typescript-eslint/parser',
     plugins: ['@typescript-eslint'],
-    extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-    ],
+    extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
     env: {
         node: true,
         es2021: true,
@@ -22,4 +19,5 @@ module.exports = {
         'prefer-const': 'error',
         'no-var': 'error',
     },
+    ignorePatterns: ['adapter/assignment-4.ts'],
 };

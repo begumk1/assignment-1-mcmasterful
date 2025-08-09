@@ -1,20 +1,21 @@
 # Assignment Hints
 
 ## Book List
+
 The book list is stored in the file `mcmasteful-book-list.json`:
 
 ```json
 [
-  {
-    "name": "Giant's Bread",
-    "author": "Agatha Christie",
-    "price": 21.86
-  },
-  {
-    "name": "Appointment with Death",
-    "author": "Agatha Christie",
-    "price": 19.63
-  }
+    {
+        "name": "Giant's Bread",
+        "author": "Agatha Christie",
+        "price": 21.86
+    },
+    {
+        "name": "Appointment with Death",
+        "author": "Agatha Christie",
+        "price": 19.63
+    }
 ]
 ```
 
@@ -23,7 +24,7 @@ The book list is stored in the file `mcmasteful-book-list.json`:
 You can import the books stored in `mcmasteful-book-list.json` into `assignment-1.ts` as follows:
 
 ```typescript
-import books from'./../mcmasteful-book-list.json';
+import books from './../mcmasteful-book-list.json';
 ```
 
 This will import the JSON data as an array of book objects.
@@ -37,15 +38,17 @@ Here are some common array methods you can use to manipulate the `books` array:
 Use `filter` to return books that meet a specific condition.
 
 Example with traditional function:
+
 ```typescript
-books.filter(function(book) {
-  return book.author === 'Agatha Christie';
+books.filter(function (book) {
+    return book.author === 'Agatha Christie';
 });
 ```
 
 Example with arrow function: () => {}
+
 ```typescript
-const booksByAuthor = books.filter(book => book.author === 'Agatha Christie');
+const booksByAuthor = books.filter((book) => book.author === 'Agatha Christie');
 console.log(booksByAuthor);
 ```
 
@@ -54,7 +57,7 @@ console.log(booksByAuthor);
 Use `map` to transform each book object into something else, like extracting the book titles.
 
 ```typescript
-const bookTitles = books.map(book => book.name);
+const bookTitles = books.map((book) => book.name);
 console.log(bookTitles);
 ```
 
@@ -63,8 +66,8 @@ console.log(bookTitles);
 Use `forEach` to loop through each book and perform an action.
 
 ```typescript
-books.forEach(book => {
-  console.log(book.name);
+books.forEach((book) => {
+    console.log(book.name);
 });
 ```
 
@@ -82,7 +85,9 @@ console.log(totalPrice);
 Use `find` to locate the first book that matches a certain condition.
 
 ```typescript
-const firstBookByAuthor = books.find(book => book.author === 'Agatha Christie');
+const firstBookByAuthor = books.find(
+    (book) => book.author === 'Agatha Christie'
+);
 console.log(firstBookByAuthor);
 ```
 
@@ -91,7 +96,9 @@ console.log(firstBookByAuthor);
 Use `some` to check if any books in the list meet a certain condition.
 
 ```typescript
-const hasBooksByAuthor = books.some(book => book.author === 'Agatha Christie');
+const hasBooksByAuthor = books.some(
+    (book) => book.author === 'Agatha Christie'
+);
 console.log(hasBooksByAuthor); // Returns true or false
 ```
 
@@ -100,7 +107,7 @@ console.log(hasBooksByAuthor); // Returns true or false
 Use `every` to check if all books meet a certain condition.
 
 ```typescript
-const allByAuthor = books.every(book => book.author === 'Agatha Christie');
+const allByAuthor = books.every((book) => book.author === 'Agatha Christie');
 console.log(allByAuthor); // Returns true or false
 ```
 
@@ -119,22 +126,23 @@ Create a function to return all books matching a specified price range.
 
 ```typescript
 interface Book {
-  name: string;
-  author: string;
-  price: number;
+    name: string;
+    author: string;
+    price: number;
 }
 
 function listBooks(filters?: { from?: number; to?: number }[]): Book[] {
-  if (!filters || filters.length === 0) {
-    return books; // No filters, return all books
-  }
+    if (!filters || filters.length === 0) {
+        return books; // No filters, return all books
+    }
 
-  return books.filter(book =>
-    filters.some(filter =>
-      (filter.from === undefined || book.price >= filter.from) &&
-      (filter.to === undefined || book.price <= filter.to)
-    )
-  );
+    return books.filter((book) =>
+        filters.some(
+            (filter) =>
+                (filter.from === undefined || book.price >= filter.from) &&
+                (filter.to === undefined || book.price <= filter.to)
+        )
+    );
 }
 
 // Example usage:
@@ -156,7 +164,7 @@ Simplify your code using object destructuring.
 
 ```typescript
 books.forEach(({ name, author }) => {
-  console.log(`Title: ${name}, Author: ${author}`);
+    console.log(`Title: ${name}, Author: ${author}`);
 });
 ```
 
@@ -166,9 +174,9 @@ Define interfaces for better type checking and code readability.
 
 ```typescript
 interface Book {
-  name: string;
-  author: string;
-  price: number;
+    name: string;
+    author: string;
+    price: number;
 }
 
 const books: Book[] = require('./../mcmasteful-book-list.json');
@@ -198,13 +206,13 @@ If you need to perform asynchronous operations, use `async/await`.
 
 ```typescript
 async function fetchBooks(): Promise<Book[]> {
-  // Simulate fetching data
-  return new Promise(resolve => {
-    setTimeout(() => resolve(books), 1000);
-  });
+    // Simulate fetching data
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(books), 1000);
+    });
 }
 
-fetchBooks().then(data => console.log(data));
+fetchBooks().then((data) => console.log(data));
 ```
 
 ### F. **Error Handling**
@@ -213,12 +221,12 @@ Always handle potential errors, especially when working with external data.
 
 ```typescript
 async function getBooks() {
-  try {
-    const data = await fetchBooks();
-    console.log(data);
-  } catch (error) {
-    console.error('An error occurred:', error);
-  }
+    try {
+        const data = await fetchBooks();
+        console.log(data);
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
 }
 
 getBooks();
@@ -229,8 +237,10 @@ getBooks();
 Use template literals for easier string interpolation.
 
 ```typescript
-books.forEach(book => {
-  console.log(`Title: ${book.name}, Author: ${book.author}, Price: $${book.price}`);
+books.forEach((book) => {
+    console.log(
+        `Title: ${book.name}, Author: ${book.author}, Price: $${book.price}`
+    );
 });
 ```
 
@@ -239,7 +249,7 @@ books.forEach(book => {
 Use arrow functions for concise function expressions.
 
 ```typescript
-const getBookNames = () => books.map(book => book.name);
+const getBookNames = () => books.map((book) => book.name);
 console.log(getBookNames());
 ```
 
@@ -248,8 +258,11 @@ console.log(getBookNames());
 Provide default values for function parameters.
 
 ```typescript
-function calculateDiscountedPrice(price: number, discount: number = 0.1): number {
-  return price - price * discount;
+function calculateDiscountedPrice(
+    price: number,
+    discount: number = 0.1
+): number {
+    return price - price * discount;
 }
 
 console.log(calculateDiscountedPrice(100)); // Uses default discount of 10%
@@ -261,9 +274,9 @@ Use rest parameters and spread syntax for flexibility.
 
 ```typescript
 function sumPrices(...prices: number[]): number {
-  return prices.reduce((total, price) => total + price, 0);
+    return prices.reduce((total, price) => total + price, 0);
 }
 
-const total = sumPrices(...books.map(book => book.price));
+const total = sumPrices(...books.map((book) => book.price));
 console.log(total);
 ```

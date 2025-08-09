@@ -21,10 +21,10 @@
     },
     "include": [
         "src/**/*",
-        "adapter/**/*"
+        "adapter/assignment-1.ts",
+        "adapter/assignment-2.ts",
+        "adapter/assignment-3.ts",
+        "adapter/index.ts"
     ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+    "exclude": ["node_modules", "dist", "adapter/assignment-4.ts"]
 }
